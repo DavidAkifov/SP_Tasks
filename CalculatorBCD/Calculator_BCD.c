@@ -3,12 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-int numberOfDigits(unsigned long long n) 
-{
-    if (n == 0)
-        return 0;
-    return floor( log10( abs( n ) ) ) + 1;
-}
 
 int main()
 {
@@ -16,12 +10,8 @@ int main()
     char operation_simbol;
     printf("Enter your first number: ");
     scanf("%d", &first_number);
-    uint64_t first_number_to_BCD = convert_to_BCD(first_number);
     printf("Enter your second number: ");
     scanf("%d", &second_number);
-    uint64_t second_number_to_BCD = convert_to_BCD(second_number);
-    printf("[main]: convertToBCD %llu  \n",first_number_to_BCD);
-    printf("[main]: convertToBCD %llu  \n",second_number_to_BCD);
     printf("Enter Operation (+/-): ");
     fflush(stdin);
     scanf("%c", &operation_simbol);
@@ -29,22 +19,11 @@ int main()
     if(operation_simbol == '+') 
     {
         printf("[main]: PLUS\n");
-        printf("%llu", sum_BCD(first_number_to_BCD, second_number_to_BCD));
+        printf("%llu", sum_BCD(first_number, second_number));
     } 
     else if (operation_simbol == '-') 
     {
-        //second_number_to_BCD |= 9;
-        int tmp1 = correct_for_subtraction(second_number);
-        printf("[main]: tmp1: %d\n", tmp1);
-        second_number_to_BCD = convert_to_BCD(tmp1);
-        uint64_t result = subtract_BCD(first_number_to_BCD, second_number_to_BCD);
-        
-
-
-        printf("second_number_to_BCD: %llu ",second_number_to_BCD);
-        printf("[main]: getMSB: %d\n",getMSB(second_number_to_BCD));
-        printf("[main]: second_number_to_BCD: %llu\n",second_number_to_BCD);
-        printf("[main]: subtract_BCD returned: %llu\n", result);
+        printf("[main]: subtract_BCD returned: %llu\n", sum_BCD(first_number, -second_number));
         printf("[main]: MINUS\n");
     } 
     else{
@@ -53,15 +32,26 @@ int main()
     return 0;
 }
 
-uint64_t sum_BCD(uint64_t first_num, uint64_t second_num)
+uint64_t sum_BCD(int first_number, int second_number)
 {
+    uint64_t first_number_to_BCD = 0;
+    uint64_t second_number_to_BCD = 0;
+    if(second_number < 0)
+    {
+        second_number_to_BCD = prep_for_subtract(second_number);
+    }
+    else
+    {
+        uint64_t second_number_to_BCD = convert_to_BCD(second_number);
+    }
+    first_number_to_BCD = convert_to_BCD(first_number);
     uint64_t result = 0;
     uint64_t carry = 0;
     uint64_t mask = 0x0F; // Mask to isolate each BCD digit
-    for (int i = 0; i < 16; i += 4) {
+    for (int i = 0; i < 64; i += 4) {
         // Extract each digit from both numbers
-        uint64_t digit1 = (first_num >> i) & mask;
-        uint64_t digit2 = (second_num >> i) & mask;
+        uint64_t digit1 = (first_number_to_BCD >> i) & mask;
+        uint64_t digit2 = (second_number_to_BCD >> i) & mask;
         
         // Add the digits along with the carry
         uint64_t sum = digit1 + digit2 + carry;
@@ -97,20 +87,24 @@ uint64_t convert_to_BCD(int dec_value)
     return valueToBCD;
 }
 
-uint64_t subtract_BCD(uint64_t first_num, uint64_t second_num)
+uint64_t prep_for_subtract(int number)
 {
-    printf("subtract_BCD: first_num: %llu second_num: %llu \n", first_num, second_num);
-    int number_lenght = getMSB(second_num);
-        for (int i = 0; i < 16; i += 4)
+    uint64_t result = 0;
+    number = -number;
+    printf("[sum_BCD]: second_number: %d\n", number);
+    correct_for_subtraction(&number);
+    result = convert_to_BCD(number);
+    printf("[sum_BCD]: result: %llu\n", result);
+    int number_lenght = getMSB(result);
+        for (int i = 0; i < 64; i += 4)
         {
             if (i > number_lenght)
             {
-                second_num |= 9 << i;
+                result |= 9 << i;
+                printf("[subtract_BCD]: result: %llu\n",result);
                 break;
             }
         }
-    uint64_t result = sum_BCD(first_num,second_num);
-
     return result;
 }
 
@@ -121,11 +115,10 @@ uint64_t digitToBinary(int digit, uint64_t result, int iteration)
     return result;
 }
 
-int correct_for_subtraction(int number){
-    printf("correct_for_subtraction: number: %d \n", number);
-    int corected_number =  (pow(10, findIntLength(number)) -1) - number + 1;
-    printf("corrected number in dec: %d \n", corected_number);
-    return corected_number;
+void correct_for_subtraction(int *number){
+    printf("correct_for_subtraction: number: %d \n", *number);
+    *number =  (pow(10, findIntLength(*number)) -1) - *number + 1;
+    printf("corrected number in dec: %d \n", *number);
 }
 
 int findIntLength(int num) {
@@ -159,7 +152,20 @@ int getMSB(uint64_t num) {
     return -1; // If num is zero
 }
 
-void perform_tens_complement(uint64_t *number)
+void print_bcd_in_binary(uint64_t number)
 {
-
+    int first_one_found = 0;
+    for (int i = 63; i >= 0; i--) {
+        uint64_t bit = (number >> i) & 1;
+        if (bit == 1 || first_one_found || i == 0) {
+            printf("%llu", bit);
+            first_one_found = 1;
+            if ((i % 4 == 0) && (i != 0)) 
+            {
+                printf(" ");
+            }
+        }
+        
+    }
+    printf("\n");
 }
