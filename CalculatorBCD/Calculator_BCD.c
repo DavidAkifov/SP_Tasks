@@ -26,17 +26,19 @@ int main()
         // printf("[main]: PLUS\n");
         uint64_t result = sum_bcd(convert_to_bcd(first_number),convert_to_bcd(second_number));
         printf("Result in BCD(binary): ");
-        print_bcd_in_binary(result);
+        print_bcd_in_binary(result, 0);
         printf("\n");
     } 
     else if (operation_simbol == '-') 
     {
         uint64_t result = subtract(first_number, second_number);
         printf("Result in BCD(binary): ");
-        print_bcd_in_binary(result);
-        printf("\n");
-        // printf("[main]: subtract_BCD returned: %llu\n", result);
-        // printf("[main]: MINUS\n");
+        if(first_number<second_number)
+        {
+            print_bcd_in_binary(result,1);
+            continue;
+        }
+        print_bcd_in_binary(result,0);
     } 
     else{
         printf("[main]: unsuported operation!\n");
@@ -51,7 +53,7 @@ int main()
         break;
     }
     }
-    
+
     return 0;
 }
 
@@ -130,8 +132,13 @@ int get_msb(uint64_t num) {
     return -1;
 }
 
-void print_bcd_in_binary(uint64_t number) {
+void print_bcd_in_binary(uint64_t number, uint8_t flag) 
+{
     int first_one_found = 0;
+    if(!flag)
+    {
+        printf("0000 ");
+    }
     for (int i = 60; i >= 0; i -= 4) {
         uint64_t bit = (number >> i) & 0xF;
         if (bit > 0 || first_one_found || i == 0) {
