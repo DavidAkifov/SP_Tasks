@@ -24,7 +24,7 @@ int main()
     if(operation_simbol == '+') 
     {
         // printf("[main]: PLUS\n");
-        uint64_t result = sum_BCD(convert_to_BCD(first_number),convert_to_BCD(second_number));
+        uint64_t result = sum_bcd(convert_to_bcd(first_number),convert_to_bcd(second_number));
         printf("Result in BCD(binary): ");
         print_bcd_in_binary(result);
         printf("\n");
@@ -55,7 +55,7 @@ int main()
     return 0;
 }
 
-uint64_t sum_BCD(uint64_t first_number, uint64_t second_number) {
+uint64_t sum_bcd(uint64_t first_number, uint64_t second_number) {
     uint64_t result = 0;
     uint64_t carry = 0;
     const uint64_t mask = 0x0F;
@@ -79,7 +79,7 @@ uint64_t sum_BCD(uint64_t first_number, uint64_t second_number) {
 }
 
 
-uint64_t convert_to_BCD(int dec_value)
+uint64_t convert_to_bcd(int dec_value)
 {
     uint64_t valueToBCD = 0;
     int digit;
@@ -191,19 +191,19 @@ void add_nine_for_sign(uint64_t *number) {
 
 uint64_t subtract(int first_number, int second_number) {
     if (!second_number) {
-        return sum_BCD(convert_to_BCD(first_number), convert_to_BCD(second_number));
+        return sum_bcd(convert_to_bcd(first_number), convert_to_bcd(second_number));
     } else if (!first_number) {
-        uint64_t result = convert_to_BCD(first_number);
+        uint64_t result = convert_to_bcd(first_number);
         add_nine_for_sign(&result);
         return result;
     } else {
         uint8_t result_flag = (first_number > second_number) ? 0 : 1;
         
         correct_for_subtraction(&second_number);
-        uint64_t second_number_bcd = convert_to_BCD(second_number);
+        uint64_t second_number_bcd = convert_to_bcd(second_number);
         add_nine_for_sign(&second_number_bcd);
         
-        uint64_t result_bcd = sum_BCD(convert_to_BCD(first_number), second_number_bcd);
+        uint64_t result_bcd = sum_bcd(convert_to_bcd(first_number), second_number_bcd);
 
         int first_one_found = 0;
         int decimal_value = 0;
@@ -222,7 +222,7 @@ uint64_t subtract(int first_number, int second_number) {
         
         if (result_flag && decimal_value) {
             int tens_complement = pow(10, findIntLength(decimal_value)) - decimal_value;
-            result_bcd = convert_to_BCD(tens_complement);
+            result_bcd = convert_to_bcd(tens_complement);
             add_nine_for_sign(&result_bcd);
         }
 

@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
-uint64_t convert_to_BCD(int dec_value);
-uint64_t sum_BCD(uint64_t first_number, uint64_t second_number);
+uint64_t convert_to_bcd(int dec_value);
+uint64_t sum_bcd(uint64_t first_number, uint64_t second_number);
 uint64_t prep_for_subtract(int number);
 uint64_t digitToBinary(int digit, uint64_t result, int iteration);
 void correct_for_subtraction(int *number);
