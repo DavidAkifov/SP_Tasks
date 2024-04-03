@@ -1,0 +1,56 @@
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_INTEGER] Received integer data: 42
+[TASK_FIVE_INTEGER] Received integer data: 69
+[TASK_FIVE_INTEGER] Received integer data: 6
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_INTEGER] Received integer data: 42
+[TASK_FIVE_INTEGER] Received integer data: 69
+[TASK_FIVE_INTEGER] Received integer data: 2
+[TASK_FIVE_INTEGER] Received integer data: 13
+[TASK_FIVE_INTEGER] Received integer data: 50
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_INTEGER] Received integer data: 69
+[TASK_FIVE_INTEGER] Received integer data: 42
+[TASK_FIVE_INTEGER] Received integer data: 13
+[TASK_FIVE_INTEGER] Received integer data: 6
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_INTEGER] Received integer data: 123
+[TASK_FIVE_INTEGER] Received integer data: 123
+[TASK_FIVE_INTEGER] Received integer data: 77
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_STRING] Received string data: 35.700001
+[TASK_FIVE_STRING] Received string data: 45.299999
+[TASK_FIVE_STRING] Received string data: 45.299999
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_INTEGER] Received integer data: 157
+[TASK_FIVE_INTEGER] Received integer data: 136
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_STRING] Received string data: 159.800003
+[TASK_FIVE_STRING] Received string data: 136.899994
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_STRING] Received string data: Emo e qk
+
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_INTEGER] Received integer data: 69
+[TASK_FIVE_INTEGER] Received integer data: 45
+[TASK_FIVE_INTEGER] Received integer data: 24
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_STRING] Received string data: Deyvid
+
+[TASK_FIVE_STRING] Received string data: deyvid
+
+[TASK_FIVE_STRING] Received string data: asd
+
+[TASK_FIVE_STRING] Received string data: qwe
+
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_STRING] Received string data: 34.500000
+[TASK_FIVE_STRING] Received string data: 34.500000
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_INTEGER] Received integer data: 42
+[TASK_FIVE_INTEGER] Received integer data: 45
+[TASK_FIVE_INTEGER] Received integer data: 23
+[TASK_FIVE] Task 5 has started!
+[TASK_FIVE_INTEGER] Received integer data: 33
+[TASK_FIVE_INTEGER] Received integer data: 34
+[TASK_FIVE_INTEGER] Received integer data: 35
