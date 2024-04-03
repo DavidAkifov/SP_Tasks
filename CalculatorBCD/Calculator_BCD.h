@@ -5,7 +5,7 @@
 
 uint64_t convert_to_bcd(int dec_value);
 uint64_t sum_bcd(uint64_t first_number, uint64_t second_number);
-int findIntLength(int num);
+int find_int_lenght(int num);
 int get_msb(uint64_t num);
 void print_bcd_in_binary(uint64_t number, uint8_t flag);
 const char* decimal_to_binary_4_bits(unsigned int num);
