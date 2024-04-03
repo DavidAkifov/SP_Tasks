@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "cerrno": "c",
+        "sem.h": "c",
+        "unistd.h": "c"
+    }
+}
