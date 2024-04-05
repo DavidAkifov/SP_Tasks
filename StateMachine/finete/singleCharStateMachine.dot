@@ -1,0 +1,47 @@
+digraph FSM {
+    START -> INTEGER [label="digit"]
+    START -> NEGATIVE_SIGN [label="-"]
+    START -> POSITIVE_SIGN [label="+"]
+    START -> OCTAL [label="0"]
+    START -> REJECT [label="other"]
+
+    POSITIVE_SIGN -> INTEGER [label="digit"]
+    POSITIVE_SIGN -> OCTAL [label="0"]
+    POSITIVE_SIGN -> REJECT [label="other"]
+
+    NEGATIVE_SIGN -> NEGATIVE_INTEGER [label="digit"]
+    NEGATIVE_SIGN -> REJECT [label="other"]
+
+    OCTAL -> OCTAL [label="digit"]
+    OCTAL -> ACCEPT [label="space or /"]
+    OCTAL -> SUFFIX_U [label="u/U"]
+    OCTAL -> SUFFIX_L [label="l/L"]
+    OCTAL -> HEX [label="x/X"]
+    OCTAL -> REJECT [label="other"]
+
+    HEX -> HEX [label="hex digit"]
+    HEX -> ACCEPT [label="space or /"]
+    HEX -> SUFFIX_U [label="u/U"]
+    HEX -> SUFFIX_L [label="l/L"]
+    HEX -> REJECT [label="other"]
+
+    INTEGER -> INTEGER [label="digit"]
+    INTEGER -> ACCEPT [label="space or /"]
+    INTEGER -> SUFFIX_U [label="u/U"]
+    INTEGER -> SUFFIX_L [label="l/L"]
+    INTEGER -> REJECT [label="other"]
+
+    NEGATIVE_INTEGER -> NEGATIVE_INTEGER [label="digit"]
+    NEGATIVE_INTEGER -> ACCEPT [label="space or /"]
+    NEGATIVE_INTEGER -> NEGATIVE_SUFFIX [label="l/L"]
+    NEGATIVE_INTEGER -> REJECT [label="other"]
+
+    SUFFIX_L -> ACCEPT [label="space or /"]
+    SUFFIX_L -> REJECT [label="other"]
+
+    SUFFIX_U -> ACCEPT [label="space or /"]
+    SUFFIX_U -> REJECT [label="other"]
+
+    NEGATIVE_SUFFIX -> ACCEPT [label="space or /"]
+    NEGATIVE_SUFFIX -> REJECT [label="other"]
+}

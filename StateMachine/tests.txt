@@ -1,0 +1,90 @@
+#######################
+Your totals should be thirty-two constants. Half of them are integers,
+the other half are reals (float, double, long double). Have fun :)
+
+Note: this assumes '+' signs in front of positive constants is valid
+#######################
+
+
+
+### VALID INTS:
+//eight decimals
+123
+-123	//negative
+123u	//unsigned
+19842U	//unsigned
++123ul	//unsigned long
+789Lu	//unsigned long
+-542ll	//negative, long long
+1uLL	//unsigned long long
+
+//four octals
+0123
+0177u	//unsigned
++010000Ul	//unsigned long
+030010llU	//unsigned long long
+
+//four hexadecimal
+0x1fA1
+0X0u	//unsigned
++0XFb03cll	//long long
+0x12eLLu	//unsigned long long
+
+
+### INVALID INTS:
+09	//can't have eights or nines with octal prefix
+0x	//must have digits after hex prefix
+-01	//octals can't be negative
+-0xF	//hex can't be negative
+-1U	//can't be negative with unsigned suffix
+123Ll	//long long suffix must be either ll or LL
+123lul	//can't insert unsigned suffix in long long suffix
+123ulu	//can't insert unsigned suffix in long long suffix
+1-1	//expression, not a constant, nor two constants
+12j	//must end with a separator
+j12	//must start with a separator
+++12	//can't have two signs
+
+
+
+
+### VALID REALS:
+//eight without exponent
+12.34	//double
+-12.340000	//negative double
+.12	//double without leading numbers
+012.	//double without tailing numbers. may start with zero so long as it has a dot, making it real instead of octal
+444.0f	//float suffix
+-.02F	//negative, without leading numbers, float suffix
++3.L	//without tailing numbers, long double suffix
+-0.l	//negative, long double suffix
+
+//eight with exponent
+1.2e3	//double with exponent
+2.E-1	//double with negative exponent
++.000005e15	//long double with exponent
+21.99E+0f	//float with exponent. zero is also a valid exponent
+000000000099.3e6L	//long double. may start with zero so long as it has an exponent, making it real instead of octal/junk
+-15e02	//double with exponent. no need to add dot if we have exponent. can have leading zeroes in exponent
+006E-2F	//float with exponent. may start with zero so long as it has an exponent, making it real instead of octal/junk
+.2e+0	//double with exponent. leading + sign before zero
+
+
+### INVALID REALS:
+0f	//must have at least one dot
+.	//must have at least one digit on either side
+.L	//must have at least one digit on either side
+123.34lf	//can't have long double and float suffix at the same time
+2.2e	//must have at least one digit after exponent
+.e2		//can't have only an exponent
+0.1u	//reals can't have unsigned suffix
+2e1LL	//reals can't have long long suffix
+2.1A	//can't have hex digits in reals
+j2.1	//can't have stuff before
+2.1j	//can't have stuff after
+2.2.1	//can't have more than one dot
+2.1e2.0	//can't have dots in exponent
+2.1e0x12	//can't have hex numbers in exponent
+2.1e0B	//can't have hex digits in exponent
+--1.2	//can't have two signs
+6.0-2.1	//can't have expressions, single constants only
