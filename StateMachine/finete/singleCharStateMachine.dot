@@ -1,40 +1,55 @@
 digraph FSM {
+    rankdir=TB; // Set the layout direction from left to right
+
     START -> INTEGER [label="digit"]
+    START -> REAL_NUMBER_WITHOUT_LEADING [label="."]
     START -> NEGATIVE_SIGN [label="-"]
     START -> POSITIVE_SIGN [label="+"]
-    START -> OCTAL [label="0"]
+    START -> CHECK_OCTAL [label="0"]
     START -> REJECT [label="other"]
 
-    POSITIVE_SIGN -> INTEGER [label="digit"]
-    POSITIVE_SIGN -> OCTAL [label="0"]
-    POSITIVE_SIGN -> REJECT [label="other"]
+    INTEGER -> INTEGER [label="digit"]
+    INTEGER -> ACCEPT [label="space, / or suffix"]
+    INTEGER -> SUFFIX_U [label="u/U"]
+    INTEGER -> SUFFIX_L [label="l/L"]
+    INTEGER -> REAL_NUMBERS_WITHOUT_E [label="."]
+    INTEGER -> REJECT [label="other"]
 
-    NEGATIVE_SIGN -> NEGATIVE_INTEGER [label="digit"]
-    NEGATIVE_SIGN -> REJECT [label="other"]
+    NEGATIVE_INTEGER -> NEGATIVE_INTEGER [label="digit"]
+    NEGATIVE_INTEGER -> ACCEPT [label="space, / or suffix"]
+    NEGATIVE_INTEGER -> NEGATIVE_SUFFIX [label="l/L"]
+    NEGATIVE_INTEGER -> REAL_NUMBERS_WITHOUT_E [label="."]
+    NEGATIVE_INTEGER -> REAL_NUMBERS_WITH_E [label="e/E"]
+    NEGATIVE_INTEGER -> REJECT [label="other"]
 
-    OCTAL -> OCTAL [label="digit"]
-    OCTAL -> ACCEPT [label="space or /"]
+    OCTAL -> OCTAL [label="digit (0-7)"]
+    OCTAL -> ACCEPT [label="space, / or suffix"]
     OCTAL -> SUFFIX_U [label="u/U"]
     OCTAL -> SUFFIX_L [label="l/L"]
     OCTAL -> HEX [label="x/X"]
+    OCTAL -> REAL_NUMBERS_WITHOUT_E [label="."]
     OCTAL -> REJECT [label="other"]
 
     HEX -> HEX [label="hex digit"]
-    HEX -> ACCEPT [label="space or /"]
+    HEX -> ACCEPT [label="space, / or suffix"]
     HEX -> SUFFIX_U [label="u/U"]
     HEX -> SUFFIX_L [label="l/L"]
     HEX -> REJECT [label="other"]
 
-    INTEGER -> INTEGER [label="digit"]
-    INTEGER -> ACCEPT [label="space or /"]
-    INTEGER -> SUFFIX_U [label="u/U"]
-    INTEGER -> SUFFIX_L [label="l/L"]
-    INTEGER -> REJECT [label="other"]
+    POSITIVE_SIGN -> INTEGER [label="digit"]
+    POSITIVE_SIGN -> OCTAL [label="0"]
+    POSITIVE_SIGN -> REAL_NUMBER_WITHOUT_LEADING [label="."]
+    POSITIVE_SIGN -> REJECT [label="other"]
 
-    NEGATIVE_INTEGER -> NEGATIVE_INTEGER [label="digit"]
-    NEGATIVE_INTEGER -> ACCEPT [label="space or /"]
-    NEGATIVE_INTEGER -> NEGATIVE_SUFFIX [label="l/L"]
-    NEGATIVE_INTEGER -> REJECT [label="other"]
+    NEGATIVE_SIGN -> NEGATIVE_INTEGER [label="digit"]
+    NEGATIVE_SIGN -> CHECK_REAL [label="0"]
+    NEGATIVE_SIGN -> REAL_NUMBER_WITHOUT_LEADING [label="."]
+    NEGATIVE_SIGN -> REJECT [label="other"]
+
+    CHECK_OCTAL -> CHECK_REAL [label="0"]
+    CHECK_OCTAL -> OCTAL [label="1-7"]
+    CHECK_OCTAL -> HEX [label="x/X"]
+    CHECK_OCTAL -> REJECT [label="other"]
 
     SUFFIX_L -> ACCEPT [label="space or /"]
     SUFFIX_L -> REJECT [label="other"]
@@ -44,4 +59,27 @@ digraph FSM {
 
     NEGATIVE_SUFFIX -> ACCEPT [label="space or /"]
     NEGATIVE_SUFFIX -> REJECT [label="other"]
+
+    CHECK_REAL -> CHECK_REAL [label="digit"]
+    CHECK_REAL -> REAL_NUMBERS_WITHOUT_E [label="."]
+    CHECK_REAL -> REAL_NUMBERS_WITH_E [label="e/E"]
+    CHECK_REAL -> REJECT [label="other"]
+
+    REAL_NUMBER_WITHOUT_LEADING -> REAL_NUMBERS_WITHOUT_E [label="digit"]
+    REAL_NUMBER_WITHOUT_LEADING -> REAL_NUMBERS_WITH_E [label="e/E"]
+    REAL_NUMBER_WITHOUT_LEADING -> REJECT [label="other"]
+
+    REAL_NUMBERS_WITHOUT_E -> REAL_NUMBERS_WITHOUT_E [label="digit"]
+    REAL_NUMBERS_WITHOUT_E -> ACCEPT [label="space, / or suffix"]
+    REAL_NUMBERS_WITHOUT_E -> SUFFIX_REAL_NUMBERS [label="f/F/l/L"]
+    REAL_NUMBERS_WITHOUT_E -> REAL_NUMBERS_WITH_E [label="e/E"]
+    REAL_NUMBERS_WITHOUT_E -> REJECT [label="other"]
+
+    REAL_NUMBERS_WITH_E -> REAL_NUMBERS_WITH_E [label="digit"]
+    REAL_NUMBERS_WITH_E -> ACCEPT [label="space, / or suffix"]
+    REAL_NUMBERS_WITH_E -> SUFFIX_REAL_NUMBERS [label="f/F/l/L"]
+    REAL_NUMBERS_WITH_E -> REJECT [label="other"]
+
+    SUFFIX_REAL_NUMBERS -> ACCEPT [label="space, / or suffix"]
+    SUFFIX_REAL_NUMBERS -> REJECT [label="other"]
 }

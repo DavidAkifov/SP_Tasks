@@ -9,15 +9,20 @@ enum State {
     POSITIVE_SIGN,
     NEGATIVE_SIGN,
     OCTAL,
+    CHECK_OCTAL,
     HEX,
     INTEGER,
     NEGATIVE_INTEGER,
     NEGATIVE_SUFFIX,
     SUFFIX_U,
     SUFFIX_L,
+    CHECK_REAL,
+    REAL_NUMBER_WITHOUT_LEADING,
+    REAL_NUMBERS_WITHOUT_E,
+    REAL_NUMBERS_WITH_E,
+    SUFFIX_REAL_NUMBERS,
     ACCEPT,
     REJECT
-
 };
 
 char previousChar;
@@ -31,6 +36,10 @@ enum State transition(enum State current, char input) {
             {
                 return INTEGER;
             }
+            else if ( input == '.')
+            {
+                return REAL_NUMBER_WITHOUT_LEADING;
+            }
             else if ( input == '-')
             {
                 return NEGATIVE_SIGN;
@@ -39,9 +48,9 @@ enum State transition(enum State current, char input) {
             {
                 return POSITIVE_SIGN;
             }
-             else if (input == '0') 
+            else if (input == '0') 
             {
-                return OCTAL;
+                return CHECK_OCTAL;
             } 
             else
             {
@@ -56,6 +65,10 @@ enum State transition(enum State current, char input) {
             {
                 return OCTAL;
             }
+            else if(input == '.')
+            {
+                return REAL_NUMBER_WITHOUT_LEADING;
+            }
             else 
             {
                 return REJECT;
@@ -63,16 +76,45 @@ enum State transition(enum State current, char input) {
         case NEGATIVE_SIGN:
             if (input == '0') 
             {
-                return REJECT;
+                return CHECK_REAL;
+            }
+            else if (input == '.')
+            {
+                return REAL_NUMBER_WITHOUT_LEADING;
             }
             else if (isdigit(input))
             {
                 return NEGATIVE_INTEGER;
             }
+            else 
+            {
+                return REJECT;
+            }
+
+        case CHECK_OCTAL:
+            {
+                if (input == '0')
+                {
+                    return CHECK_REAL;
+                }
+                else if (input > '0' && input < '8')
+                {
+                    return OCTAL;
+                }
+                else if (input == 'x' || input == 'X')
+                {
+                    return HEX;
+                }
+                else
+                {
+                    return REJECT;
+                }
+                
+            }
         case OCTAL:
             if(input == '8' || input == '9')
             {
-                return REJECT;
+                return CHECK_REAL;
             }
             else if (isdigit(input))
             {
@@ -93,6 +135,10 @@ enum State transition(enum State current, char input) {
             else if (input == 'x' || input == 'X' )
             {
                 return HEX;
+            }
+            else if (input == '.')
+            {
+                return REAL_NUMBERS_WITHOUT_E;
             }
             else
             {
@@ -139,6 +185,10 @@ enum State transition(enum State current, char input) {
             {
                 return SUFFIX_L;
             }
+            else if (input == '.')
+            {
+                return REAL_NUMBERS_WITHOUT_E;
+            }
             else
             {
                 return REJECT;
@@ -160,6 +210,14 @@ enum State transition(enum State current, char input) {
             {
                 return NEGATIVE_SUFFIX;
             }
+            else if (input == '.')
+            {
+                return REAL_NUMBERS_WITHOUT_E;
+            }
+            else if (input == 'e' || input == 'E')
+            {
+                return REAL_NUMBERS_WITH_E;
+            }
             else
             {
                 return REJECT;
@@ -169,14 +227,10 @@ enum State transition(enum State current, char input) {
             {
                 return REJECT;
             } 
-            else if (input == 'l'  && previousChar == 'l')
+            else if ((input == 'l'  && previousChar == 'l') || (input == 'L'  && previousChar == 'L'))
             {
                 return SUFFIX_L; 
             } 
-            else if (input == 'L'  && previousChar == 'L')
-            {
-                return SUFFIX_L; 
-            }
             else if ((input == 'u' || input == 'U') && (previousChar == 'l' || previousChar == 'L'))
             {
                 return SUFFIX_L; 
@@ -239,6 +293,103 @@ enum State transition(enum State current, char input) {
             {
                 return REJECT;
             }
+        case CHECK_REAL: 
+            if (input >= '0' && input <= '9')
+            {
+                return CHECK_REAL;
+            }
+            else if (input == '.')
+            {
+                return REAL_NUMBERS_WITHOUT_E;
+            }
+            else if (input == 'e' || input == 'E')
+            {
+                return REAL_NUMBERS_WITH_E;
+            }
+            else
+            {
+                return REJECT;
+            }
+        case REAL_NUMBERS_WITHOUT_E:
+            if (isdigit(input))
+            {
+                return REAL_NUMBERS_WITHOUT_E;
+            }
+            else if (isspace(input) || input == '\0' || input == '/')
+            {
+                return ACCEPT;
+            }
+            else if (input =='e' || input == 'E')
+            {
+                return REAL_NUMBERS_WITH_E;
+            }
+            else if (input == 'f' || input == 'F' || input == 'l' || input == 'L')
+            {
+                return SUFFIX_REAL_NUMBERS;
+            }
+            else
+            {
+                return REJECT;
+            }
+        case REAL_NUMBERS_WITH_E:
+            if (isdigit(input))
+            {
+                return REAL_NUMBERS_WITH_E;
+            }
+            else if (input == '-' || input == '+')
+            {
+                return REAL_NUMBERS_WITH_E;
+            }
+            else if ( (previousChar == '.' || previousChar == 'e' || previousChar == 'E' ) && (isspace(input) || input == '\0' || input == '/'))
+            {
+                return REJECT;
+            }
+            else if (isspace(input) || input == '\0' || input == '/')
+            {
+                return ACCEPT;
+            }
+            else if (input == 'f' || input == 'F' || input == 'l' || input == 'L')
+            {
+                return SUFFIX_REAL_NUMBERS;
+            }
+            else
+            {
+                return REJECT;
+            }
+        case REAL_NUMBER_WITHOUT_LEADING:
+            if(isspace(input) || input == '\0' || input == '/')
+            {
+                return REJECT;
+            }
+            else if (input == 'e' || input == 'E')
+            {
+                return REAL_NUMBERS_WITH_E;
+            }
+            else if (isdigit(input))
+            {
+                return REAL_NUMBERS_WITHOUT_E;
+            }
+            else
+            {
+                return REJECT;
+            }
+        case SUFFIX_REAL_NUMBERS:
+            if((previousChar != input) && (input == 'l' || input == 'L'))
+            {
+                return ACCEPT;
+            }
+            if((previousChar != input) && (input == 'f' || input == 'F'))
+            {
+                return ACCEPT;
+            }
+            else if (isspace(input) || input == '\0' || input == '/')
+            {
+                return ACCEPT;
+            }
+            else
+            {
+                return REJECT;
+            }
         default:
             return REJECT;
     }
@@ -291,7 +442,7 @@ int main() {
         return 1;
     }
 
-    char line[100]; // Assuming each line in the file is at most 100 characters long
+    char line[255]; // Assuming each line in the file is at most 100 characters long
     int valid_ints_count = 0;
 
     while (fgets(line, sizeof(line), file)) {
