@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <string.h>
 
-// Define states
 enum State {
     START,
     POSITIVE_SIGN,
@@ -28,7 +27,6 @@ enum State {
 char previousChar;
 char suffix_checker;
 
-// Function to determine the next state based on the current state and input character
 enum State transition(enum State current, char input) {
     switch(current) {
         case START:
@@ -396,33 +394,41 @@ enum State transition(enum State current, char input) {
     
 }
 
-// Function to validate input against the FSM
 bool validate_integer(const char *input) {
     enum State current = START;
 
     for (int i = 0; input[i] != '\0'; i++) {
         char current_char = input[i];
-        if(input[i-1])
+        if (input[i-1])
             previousChar = input[i-1];
-        // // Convert 'l' or 'u' to uppercase
-        // if (current_char == 'l' || current_char == 'u') {
-        //     current_char = toupper(current_char);
-        // }
         current = transition(current, current_char);
         if (current == REJECT) {
             printf("Rejected input '%s': ", input);
-            switch (current_char) {
-                case '+':
+            switch (current) {
+                case POSITIVE_SIGN:
                     printf("Positive sign '+' at an unexpected position\n");
                     break;
-                case '-':
+                case NEGATIVE_SIGN:
                     printf("Negative sign '-' at an unexpected position\n");
                     break;
-                case 'l':
-                case 'L':
-                case 'u':
-                case 'U':
+                case OCTAL:
+                    printf("Unexpected digit '%c' in octal representation\n", current_char);
+                    break;
+                case HEX:
+                    printf("Invalid hexadecimal digit '%c'\n", current_char);
+                    break;
+                case SUFFIX_L:
+                case SUFFIX_U:
                     printf("Unexpected suffix '%c'\n", current_char);
+                    break;
+                case REAL_NUMBER_WITHOUT_LEADING:
+                    printf("Decimal point '.' at an unexpected position\n");
+                    break;
+                case REAL_NUMBERS_WITHOUT_E:
+                    printf("Unexpected character '%c' in real number\n", current_char);
+                    break;
+                case REAL_NUMBERS_WITH_E:
+                    printf("Unexpected character '%c' after 'e' in real number\n", current_char);
                     break;
                 default:
                     printf("Unexpected character '%c'\n", current_char);
@@ -435,6 +441,7 @@ bool validate_integer(const char *input) {
     return current == ACCEPT;
 }
 
+
 int main() {
     FILE *file = fopen("tests.txt", "r");
     if (file == NULL) {
@@ -442,30 +449,25 @@ int main() {
         return 1;
     }
 
-    char line[255]; // Assuming each line in the file is at most 100 characters long
+    char line[255];
     int valid_ints_count = 0;
 
     while (fgets(line, sizeof(line), file)) {
-        // Trim trailing newline character if present
         char *newline_pos = strchr(line, '\n');
         if (newline_pos != NULL) {
             *newline_pos = '\0';
         }
 
-        // Find the position of the comment symbol
         char *comment_pos = strchr(line, '/');
         if (comment_pos != NULL) {
-            // Null terminate the string just before the comment symbol
             *comment_pos = '\0';
         }
 
-        // Skip leading whitespace
         char *number_start = line;
         while (isspace(*number_start)) {
             number_start++;
         }
 
-        // Validate the integer part before the comment
         if (validate_integer(number_start)) {
             valid_ints_count++;
             printf("Accepted input: %s\n", number_start);
