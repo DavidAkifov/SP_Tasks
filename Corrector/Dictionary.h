@@ -2,9 +2,9 @@
 #define DICTIONARY_H
 
 #define NDGR1 17
+#define NDGR2 14
 
 
-// Word sequences to check for
 const wchar_t* ndgr1[NDGR1] = {
     L"Например",
     L"Всъщност",
@@ -24,4 +24,22 @@ const wchar_t* ndgr1[NDGR1] = {
     L"В действителност",
     L"В края на краищата"
 };
+
+const wchar_t* ndgr2[NDGR2] = {
+    L"Казват",
+    L"Напротив",
+    L"Разбира се",
+    L"Изглежда",
+    L"Струва ми се",
+    L"Види се",
+    L"Общо взето",
+    L"Тъй да се каже",
+    L"Между нас казано",
+    L"Както казват",
+    L"Първо",
+    L"Второ",
+    L"Трето",
+    L"Естествено"
+};
+
 #endif // DICTIONARY_H
