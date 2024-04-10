@@ -26,5 +26,7 @@ void printDiff(const wchar_t* str1, const wchar_t* str2);
 void remove_space_before_dot(wchar_t* dest);
 void add_space_after_coma_before_alphanum(wchar_t* dest);
 void count_consecutive_dots(wchar_t* dest);
+void remove_comma_after_starting_word(wchar_t* dest);
+void remove_comma_before_and_after_punct(wchar_t* dest);
 
 #endif // CORRECTOR_H

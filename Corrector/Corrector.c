@@ -5,6 +5,7 @@
 #include <wctype.h>
 #include <string.h>
 #include "Corrector.h"
+#include "Dictionary.h"
 
 #define INITIAL_SENTENCE_LENGTH 500
 #define INCREMENT_SIZE 200
@@ -139,7 +140,9 @@ void state_first_punct()
         remove_space_before_dot(dest);
         add_space_after_coma_before_alphanum(dest);
         count_consecutive_dots(dest);
-        printDiff(sentence, dest);
+        remove_comma_after_starting_word(dest);
+        remove_comma_before_and_after_punct(dest);
+        // printDiff(sentence, dest);
         printf("dest: %ls\n", dest);
         
         memset(sentence, 0, INITIAL_SENTENCE_LENGTH);
@@ -204,7 +207,7 @@ void remove_space_before_dot(wchar_t* dest)
         // Check for a space followed by a dot
         if (dest[i] == L' ' && (is_punct(dest[i + 1]) || iswspace(dest[i + 1]))) 
         {
-            wprintf(L"Found a space followed by a dot at index %d.\n", i);
+            // wprintf(L"Found a space followed by a dot at index %d.\n", i);
             // Shift characters after the space and dot combination to the left
             int j;
             for (j = i; dest[j] != L'\0'; j++) 
@@ -229,7 +232,7 @@ void add_space_after_coma_before_alphanum(wchar_t* dest)
     printf("Last character: %lc\n", dest[length - 1]);
     if (dest[length - 1] == L',') 
     {
-        printf("Found a wide comma at the end of the sentence.\n");
+        // printf("Found a wide comma at the end of the sentence.\n");
         // Allocate memory for the new sentence with an additional space
         wchar_t* new_sentence = realloc((wchar_t*)dest, (length + 4) * sizeof(wchar_t));
 
@@ -272,7 +275,7 @@ void count_consecutive_dots(wchar_t* dest)
         }
         if (consecutive_dots > 3) 
         {
-            wprintf(L"Found more than 3 consecutive dots at index %d.\n", i);
+            // wprintf(L"Found more than 3 consecutive dots at index %d.\n", i);
 
             // Shift characters after the space and dot combination to the left
             int j;
@@ -284,11 +287,66 @@ void count_consecutive_dots(wchar_t* dest)
             i--;
         }
     }
+}
+// 9
+void remove_comma_after_starting_word(wchar_t* dest) 
+{
+    int max_length = 0;
 
-    // Check if consecutive dots count exceeds 3 at the end of the string
-    // if (consecutive_dots > 3) {
-    //     wprintf(L"Found more than 3 consecutive dots at the end of the sentence.\n");
-    // }
+    // Iterate over each word sequence
+    for (int i = 0; i < NDGR1; i++) {
+        const wchar_t* sequence = ndgr1[i];
+        int sequence_length = wcslen(dest);
 
-    wprintf(L"Found: %d dots", consecutive_dots);
+        // Check if the sequence is present in the sentence
+        const wchar_t* found = wcsstr(dest, sequence);
+        if (found != NULL) {
+            // Calculate the length of the sequence found in the sentence
+            int length = wcslen(found);
+
+            // Update max_length if the current sequence is longer
+            if (length > max_length) {
+                max_length = length;
+            }
+        }
+    }
+    if(dest[max_length-2] == L',')
+    {
+        // wprintf(L"dest[max_length]: %lc\n", dest[max_length]);
+        // wprintf(L"Found a comma after the starting word at index %d.\n", max_length);
+        // Shift characters after the space and dot combination to the left
+        int j;
+        for (j = max_length-2; dest[j] != L'\0'; j++) 
+        {
+            dest[j] = dest[j + 1];
+        }
+        // Update the loop control variable to recheck the same position
+        max_length--;
+    }
+    printf("Max length: %d\n", max_length);
+}
+
+// 6
+
+void remove_comma_before_and_after_punct(wchar_t* dest) 
+{
+    // Iterate through the wide characters of the sentence
+    for (int i = 0; dest[i] != L'\0'; i++) 
+    {
+        // Check for a comma followed by a dot
+        if (dest[i] == L',' && (is_punct(dest[i + 1]) || iswspace(dest[i + 1]))) 
+        {
+            // wprintf(L"Found a comma followed by a dot at index %d.\n", i);
+            // Shift characters after the space and dot combination to the left
+            int j;
+            for (j = i; dest[j] != L'\0'; j++) 
+            {
+                dest[j] = dest[j + 1];
+            }
+            // Update the loop control variable to recheck the same position
+            i--;
+        }
+    }
+    count_consecutive_dots(dest);
+    wprintf(L"[%ls]\n", dest);
 }
