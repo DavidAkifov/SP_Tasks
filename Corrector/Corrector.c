@@ -138,8 +138,9 @@ void state_first_punct()
 
         remove_space_before_dot(dest);
         add_space_after_coma_before_alphanum(dest);
-        //count_consecutive_dots(dest);
+        count_consecutive_dots(dest);
         printDiff(sentence, dest);
+        printf("dest: %ls\n", dest);
         
         memset(sentence, 0, INITIAL_SENTENCE_LENGTH);
         // printf("Current index: %d\n", current_index);
@@ -269,12 +270,25 @@ void count_consecutive_dots(wchar_t* dest)
         {
             consecutive_dots = 0;
         }
+        if (consecutive_dots > 3) 
+        {
+            wprintf(L"Found more than 3 consecutive dots at index %d.\n", i);
+
+            // Shift characters after the space and dot combination to the left
+            int j;
+            for (j = i; dest[j] != L'\0'; j++) 
+            {
+                dest[j] = dest[j + 1];
+            }
+            // Update the loop control variable to recheck the same position
+            i--;
+        }
     }
 
     // Check if consecutive dots count exceeds 3 at the end of the string
-    if (consecutive_dots > 3) {
-        wprintf(L"Found more than 3 consecutive dots at the end of the sentence.\n");
-    }
+    // if (consecutive_dots > 3) {
+    //     wprintf(L"Found more than 3 consecutive dots at the end of the sentence.\n");
+    // }
 
     wprintf(L"Found: %d dots", consecutive_dots);
 }
