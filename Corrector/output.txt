@@ -1,0 +1,114 @@
+R[Премахни много точки ...  .. .....?. ..:,ȀȀȀȀȀȀȀȀȀ𤈀䈀𤈀䈀䈀ȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀC[Премахни много точки ...  .. .....?. ..:,ȀȀȀȀȀȀȀȀȀ𤈀䈀𤈀䈀䈀ȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀFound a space followed by a dot at index 20.
+Found a space followed by a dot at index 23.
+Found a space followed by a dot at index 23.
+Found a space followed by a dot at index 25.
+Found a space followed by a dot at index 32.
+145[Премахни много точки..........?...:,ȀȀȀȀȀȀȀȀȀ𤈀䈀𤈀䈀䈀ȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀLength before: 292
+Length after: 292
+7[Премахни много точки..........?...:,ȀȀȀȀȀȀȀȀȀ𤈀䈀𤈀䈀䈀ȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀȀUnchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: 䈀
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: 䈀
+Unchanged: 䈀
+Unchanged: 𤈀
+Unchanged: 䈀
+Unchanged: 𤈀
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: Ȁ
+Unchanged: ,
+Unchanged: :
+Unchanged: .
+Unchanged: .
+Removed:  
+Unchanged: .
+Unchanged: ?
+Unchanged: .
+Unchanged: .
+Unchanged: .
+Unchanged: .
+Unchanged: .
+Removed:  
+Unchanged: .
+Unchanged: .
+Removed:  
+Removed:  
+Unchanged: .
+Unchanged: .
+Unchanged: .
+Removed:  
+Unchanged: и
+Unchanged: к
+Unchanged: ч
+Unchanged: о
+Unchanged: т
+Unchanged:  
+Unchanged: о
+Unchanged: г
+Unchanged: о
+Unchanged: н
+Unchanged: м
+Unchanged:  
+Unchanged: и
+Unchanged: н
+Unchanged: х
+Unchanged: а
+Unchanged: м
+Unchanged: е
+Unchanged: р
+Unchanged: П
+L[м]

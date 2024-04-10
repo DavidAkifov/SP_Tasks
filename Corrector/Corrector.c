@@ -10,38 +10,32 @@
 #define INCREMENT_SIZE 200
 
 wchar_t ch;
+
 int number_of_dots = 0;
 
 // Array of function pointers representing state functions
-StateFunction stateFunctions[NUM_STATES] = {
-    state_initial,
-    state_word,
-    state_space,
-    state_dot_counting,
-    state_dot_removal
+StateFunction state_functions[NUM_STATES] = {
+    state_alphanumeric,
+    state_first_punct
 };
 
 // Current state variable
-State currentState = STATE_INITIAL;
-State previousState = STATE_INITIAL;
+State currentState = STATE_ALPHANUMERIC;
 
-char *sentence;
-int index = 0;
+wchar_t *sentence;
+int current_index = 0;
+FILE *file;
 
-
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     // Set the locale to support UTF-8
     setlocale(LC_CTYPE, "en_US.UTF-8");
 
-    FILE *file;
-
     // Read from the file
-    char* input_file = argv[1];
+    char* input_file = "simple.txt";
     char* output_file = argv[2];
 
     // Open the file
-    file = fopen(input_file, "r");
+    file = fopen(input_file, "r+, ccs=UTF-8");
 
     // Check if the file exists
     if (file == NULL) {
@@ -50,7 +44,7 @@ int main(int argc, char* argv[])
     }
 
     // Print each sentence in the console
-    printSentences(file);
+    print_sentences();
 
     // Close the file
     fclose(file);
@@ -60,157 +54,227 @@ int main(int argc, char* argv[])
 }
 
 // Function to print each sentence in the console
-void printSentences(FILE *file) {
-    sentence = (char *)malloc(INITIAL_SENTENCE_LENGTH * sizeof(char));
+void print_sentences() {
+    sentence = (wchar_t *)malloc(INITIAL_SENTENCE_LENGTH * sizeof(wchar_t));
     int sentenceLength = INITIAL_SENTENCE_LENGTH;
 
     // Read characters from the file until EOF
-    while ((ch = fgetwc(file)) != EOF) {
-        // Add the character to the sentence array
-        sentence[index++] = ch;
-        stateFunctions[currentState]();
+    while ((ch = fgetwc(file)) != WEOF) {
+        state_functions[currentState]();
 
-        // Check if the character is a sentence-ending punctuation mark
-        if (ch == '.' || ch == '?' || ch == '!') {
-            // Print the sentence and reset index
-            printf("%.*s\n", index, sentence); // Print the sentence directly using printf
+        // [V] Copy the old in the new         
 
-            // We have the sentence here
-            // Do the correction
+        // [ ] Perform the correction on the new array
 
-            index = 0; // Reset index
-        }
+        // [ ] Compare the two arrays with the function we have
+
+        // [ ] Print it colorfully
+
+        // [ ] Write the corrected sentence to the output file
+
 
         // Check if sentence array is full and realloc
-        if (index >= sentenceLength) {
+        if (current_index >= sentenceLength) {
             sentenceLength += INCREMENT_SIZE;
-            sentence = (char *)realloc(sentence, sentenceLength * sizeof(char));
+            sentence = (wchar_t *)realloc(sentence, sentenceLength * sizeof(wchar_t));
             if (sentence == NULL) {
                 printf("Memory reallocation failed\n");
                 exit(1);
             }
         }
     }
-
-    // Print the last sentence if it doesn't end with a punctuation mark
-    if (index > 0) {
-        printf("%.*s\n", index, sentence); // Print the last sentence
+    // Last sentence check
+    if (current_index > 0) {
+        wprintf(L"L[%ls]\n", sentence);
     }
 
     // Free dynamically allocated memory
     free(sentence);
 }
 
-void state_initial()
+void state_alphanumeric()
 {
-    printf("Current state: INITIAL\n");
+    // printf("Current state: ALPHANUMERIC\n");
 
-    if (iswalpha(ch)) 
+    if (is_punct(ch)) 
     {
-        printf("[%lc] is a letter.\n\n", ch);
-        currentState = STATE_WORD;
-    }
-    else if (iswdigit(ch)) 
-    {
-        printf("[%lc] is a number.\n\n", ch);
-        currentState = STATE_WORD;
+        currentState = STATE_FIRST_PUNCT;
+        sentence[current_index++] = ch;
     }
     else 
     {
-        printf("[%lc] is neither a letter nor a number.\n\n", ch);
+        currentState = STATE_ALPHANUMERIC;
+        sentence[current_index++] = ch;
     }
 }
 
-void state_word()
+void state_first_punct()
 {
-    printf("Current state: WORD\n");
+    // printf("Current state: FIRST_PUNCT\n");
 
-    if (iswalpha(ch)) 
+    if (iswspace(ch) || is_punct(ch) || ch == '-')
     {
-        printf("[%lc] is a letter.\n\n", ch);
-        currentState = STATE_WORD;
-    }
-    else if (iswdigit(ch)) 
-    {
-        printf("[%lc] is a number.\n\n", ch);
-        currentState = STATE_WORD;
-    }
-    else if (iswspace(ch))
-    {
-        printf("[%lc] is a space.\n\n", ch);
-        currentState = STATE_SPACE;
+        currentState = STATE_FIRST_PUNCT;
+        sentence[current_index++] = ch;
     }
     else 
     {
-        printf("[%lc] is neither a letter nor a number.\n\n", ch);
-    }
-}
-
-void state_space()
-{
-    printf("Current state: SPACE\n");
-    if (iswalpha(ch)) 
-    {
-        printf("[%lc] is a letter.\n\n", ch);
-        currentState = STATE_WORD;
-    }
-    else if (iswdigit(ch)) 
-    {
-        printf("[%lc] is a number.\n\n", ch);
-        currentState = STATE_WORD;
-    }
-    else if (iswspace(ch))
-    {
-        printf("[%lc] is a space.\n\n", ch);
-        currentState = STATE_SPACE;
-    }
-    else if (ch == '.')
-    {
-        printf("[%lc] is a dot.\n\n", ch);
-        number_of_dots += 1;
-        currentState = STATE_DOT_COUNTING;
-    }
-    else 
-    {
-        printf("[%lc] is neither a letter nor a number.\n\n", ch);
-    }
-}
-
-void state_dot_counting()
-{
-    printf("Current state: DOT_COUNTING\n");
-    if (ch == '.')
-    {
-        printf("[%lc] is a dot.\n\n", ch);
-        number_of_dots += 1;
-        currentState = STATE_DOT_COUNTING;
-    }
-    else 
-    {
-        printf("[%lc] is not a dot.\n", ch);
-        currentState = STATE_INITIAL;
-
-        printf("There are %d [.]\n\n", number_of_dots);
-
-        char* new_sentence = (char*) malloc(INITIAL_SENTENCE_LENGTH * sizeof(char));
-        strcpy(new_sentence, sentence);
-        memmove(&new_sentence[index], &new_sentence[index + 1], strlen(new_sentence) - index);
-        printf("Original sentence: %s\n", sentence);
-        printf("Modified sentence: %s\n", new_sentence);
-
-        if (number_of_dots > 3)
-        {
-            // Correct the number of dots to 3
+        currentState = STATE_ALPHANUMERIC;
+        // seek back one character
+        fpos_t position;
+        // Get the current position in the file
+        int res = fseek(file, -2, SEEK_CUR);
+        if (res != 0) {
+            perror("Error seeking back one character");
+            fclose(file);
         }
-        else if (number_of_dots == 2)
-        {
-            // Correct the number of dots to 1
+        // Print the sentence and reset current_index
+        wprintf(L"R[%ls]\n", sentence);
+        // Copy the sentence to another array
+        wchar_t *dest = (wchar_t *)malloc(INITIAL_SENTENCE_LENGTH * sizeof(wchar_t));
+        wcscpy(dest, sentence); 
+        wprintf(L"C[%ls]\n", dest);
+
+
+        remove_space_before_dot(dest);
+        add_space_after_coma_before_alphanum(dest);
+        //count_consecutive_dots(dest);
+        printDiff(sentence, dest);
+        
+        memset(sentence, 0, INITIAL_SENTENCE_LENGTH);
+        // printf("Current index: %d\n", current_index);
+        current_index = 0;
+
+    }
+}
+
+uint8_t is_punct(wchar_t ch)
+{
+    return (ch == '.' || ch == '?' || ch == '!' || ch == ',' || ch == ':');
+}
+
+void printDiff(const wchar_t* str1, const wchar_t* str2) {
+    size_t len1 = wcslen(str1);
+    size_t len2 = wcslen(str2);
+
+    int dp[INITIAL_SENTENCE_LENGTH][INITIAL_SENTENCE_LENGTH];
+
+    // Initialize the dynamic programming table
+    for (size_t i = 0; i <= len1; ++i) {
+        for (size_t j = 0; j <= len2; ++j) {
+            if (i == 0)
+                dp[i][j] = j;  // If the first string is empty, all characters of second string are added
+            else if (j == 0)
+                dp[i][j] = i;  // If the second string is empty, all characters of first string are deleted
+            else if (str1[i - 1] == str2[j - 1])
+                dp[i][j] = dp[i - 1][j - 1];  // Characters are same, no operation required
+            else
+                dp[i][j] = 1 + (dp[i - 1][j - 1] < dp[i - 1][j] ? (dp[i - 1][j - 1] < dp[i][j - 1] ? dp[i - 1][j - 1] : dp[i][j - 1]) : (dp[i - 1][j] < dp[i][j - 1] ? dp[i - 1][j] : dp[i][j - 1])); // Minimum of replace, delete, and insert operations
+        }
+    }
+
+    // Trace back to find the edits
+    size_t i = len1, j = len2;
+    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && str1[i - 1] == str2[j - 1]) {
+            wprintf(L"Unchanged: %lc\n", str1[i - 1]);
+            i--;
+            j--;
+        } else if (j > 0 && (i == 0 || dp[i][j] == dp[i][j - 1] + 1)) {
+            wprintf(L"Added: %lc\n", str2[j - 1]);
+            j--;
+        } else if (i > 0 && (j == 0 || dp[i][j] == dp[i - 1][j] + 1)) {
+            wprintf(L"Removed: %lc\n", str1[i - 1]);
+            i--;
+        } else {
+            wprintf(L"Replaced: %lc with %lc\n", str1[i - 1], str2[j - 1]);
+            i--;
+            j--;
         }
     }
 }
 
-void state_dot_removal()
+// 1, 4, 5, 8
+void remove_space_before_dot(wchar_t* dest)
 {
-    printf("Current state: DOT_REMOVAL\n");
+    // Iterate through the wide characters of the sentence
+    for (int i = 0; dest[i] != L'\0'; i++) 
+    {
+        // Check for a space followed by a dot
+        if (dest[i] == L' ' && (is_punct(dest[i + 1]) || iswspace(dest[i + 1]))) 
+        {
+            wprintf(L"Found a space followed by a dot at index %d.\n", i);
+            // Shift characters after the space and dot combination to the left
+            int j;
+            for (j = i; dest[j] != L'\0'; j++) 
+            {
+                dest[j] = dest[j + 1];
+            }
+            // Update the loop control variable to recheck the same position
+            i--;
+        }
+    }
+    wprintf(L"145[%ls]\n", dest);
 }
 
+// 7
+void add_space_after_coma_before_alphanum(wchar_t* dest)
+{
+
+    size_t length = wcslen(dest);
+    printf("Length before: %zu\n", length);
+
+    // Check if the last character is a wide comma
+    printf("Last character: %lc\n", dest[length - 1]);
+    if (dest[length - 1] == L',') 
+    {
+        printf("Found a wide comma at the end of the sentence.\n");
+        // Allocate memory for the new sentence with an additional space
+        wchar_t* new_sentence = realloc((wchar_t*)dest, (length + 4) * sizeof(wchar_t));
+
+        if (new_sentence)
+        {
+            printf("Memory reallocated successfully\n");
+            // Add a space after the wide comma
+            new_sentence[length] = L' '; // Add the space after the comma
+            new_sentence[length + 1] = L'\0'; // Null-terminate the string
+            wprintf(L"New sentence: %ls\n", new_sentence);
+
+            dest = new_sentence;         //deallocation using free has been done assuming that ptr and ptr1 do not point to the same address                     
+        }
+        else
+        {
+            free(dest);          //to deallocate the previous memory block pointed by ptr so as not to leave orphaned blocks of memory when ptr=ptr1 executes and ptr moves on to another block
+            // Handle the case where realloc fails
+            wprintf(L"Memory reallocation failed\n");
+            exit(1);
+        }
+    }
+    printf("Length after: %lu\n", wcslen(dest));
+    wprintf(L"7[%ls]\n", dest);
+}
+
+void count_consecutive_dots(wchar_t* dest) 
+{
+    int consecutive_dots = 0;
+
+    // Iterate through the wide characters of the string
+    for (int i = 0; dest[i] != L'\0'; i++) {
+        // Check if the character is a dot
+        if (dest[i] == L'.') 
+        {
+            consecutive_dots++;
+        } 
+        else 
+        {
+            consecutive_dots = 0;
+        }
+    }
+
+    // Check if consecutive dots count exceeds 3 at the end of the string
+    if (consecutive_dots > 3) {
+        wprintf(L"Found more than 3 consecutive dots at the end of the sentence.\n");
+    }
+
+    wprintf(L"Found: %d dots", consecutive_dots);
+}
