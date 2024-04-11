@@ -309,7 +309,7 @@ enum State transition(enum State current, char input) {
             {
                 return REAL_NUMBERS_WITH_E;
             }
-            else if (input == 'f' || input == 'F' || input == 'l' || input == 'L')
+            else if (input == 'u' || input == 'U' ||  input == 'f' || input == 'F' || input == 'l' || input == 'L')
             {
                 return SUFFIX_REAL_NUMBERS;
             }
@@ -330,8 +330,7 @@ enum State transition(enum State current, char input) {
             {
                 return REJECT;
             }
-             
-            else if (input == 'f' || input == 'F' || input == 'l' || input == 'L' || input == '\n')
+            else if (input == 'U' || input == 'U' || input == 'f' || input == 'F' || input == 'l' || input == 'L' || input == '\n')
             {
                 return SUFFIX_REAL_NUMBERS;
             }
