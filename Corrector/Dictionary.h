@@ -3,6 +3,7 @@
 
 #define NDGR1 17
 #define NDGR2 14
+#define NDGR3 14
 
 
 const wchar_t* ndgr1[NDGR1] = {
@@ -41,5 +42,22 @@ const wchar_t* ndgr2[NDGR2] = {
     L"Трето",
     L"Естествено"
 };
+
+const wchar_t* ndgr3[NDGR3] = {
+    L"Казват",
+    L"Напротив",
+    L"Разбира се",
+    L"Изглежда",
+    L"Струва ми се",
+    L"Види се",
+    L"Общо взето",
+    L"Тъй да се каже",
+    L"Между нас казано",
+    L"Както казват",
+    L"Първо",
+    L"Второ",
+    L"Трето",
+    L"Естествено"
+}; 
 
 #endif // DICTIONARY_H

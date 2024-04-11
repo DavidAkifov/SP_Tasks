@@ -10,6 +10,12 @@
 #define INITIAL_SENTENCE_LENGTH 500
 #define INCREMENT_SIZE 200
 
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN_BG   "\x1b[42m"
+#define ANSI_COLOR_RED_BG     "\x1b[41m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 wchar_t ch;
 
 int number_of_dots = 0;
@@ -97,7 +103,7 @@ void state_alphanumeric()
 {
     // printf("Current state: ALPHANUMERIC\n");
 
-    if (is_punct(ch)) 
+    if (is_punct(ch)/* && ch != L','*/) 
     {
         currentState = STATE_FIRST_PUNCT;
         sentence[current_index++] = ch;
@@ -130,31 +136,83 @@ void state_first_punct()
             fclose(file);
         }
         // Print the sentence and reset current_index
-        wprintf(L"R[%ls]\n", sentence);
+        wprintf(L"\nR[%ls]\n", sentence);
         // Copy the sentence to another array
         wchar_t *dest = (wchar_t *)malloc(INITIAL_SENTENCE_LENGTH * sizeof(wchar_t));
         wcscpy(dest, sentence); 
-        wprintf(L"C[%ls]\n", dest);
+        // wprintf(L"C[%ls]\n", dest);
 
 
         remove_space_before_dot(dest);
-        add_space_after_coma_before_alphanum(dest);
         count_consecutive_dots(dest);
         remove_comma_after_starting_word(dest);
         remove_comma_before_and_after_punct(dest);
-        // printDiff(sentence, dest);
-        printf("dest: %ls\n", dest);
-        
+        add_comma_after_starting_word(dest);
+        remove_comma_after_che(dest);
+        add_comma_after_za_syjalenie(dest);
+        add_space_after_coma_before_alphanum(dest);
+        wprintf(L"C[%ls]\n", dest);
+        printDiff(sentence, dest);
+        // printDiffForward(sentence, dest);
+        write_corrected_sentence_to_file(dest);
+
         memset(sentence, 0, INITIAL_SENTENCE_LENGTH);
         // printf("Current index: %d\n", current_index);
         current_index = 0;
-
     }
 }
 
 uint8_t is_punct(wchar_t ch)
 {
     return (ch == '.' || ch == '?' || ch == '!' || ch == ',' || ch == ':');
+}
+
+void printDiffForward(const wchar_t* str1, const wchar_t* str2) {
+    size_t len1 = wcslen(str1);
+    size_t len2 = wcslen(str2);
+
+    int dp[INITIAL_SENTENCE_LENGTH][INITIAL_SENTENCE_LENGTH];
+
+    // Initialize the dynamic programming table
+    for (size_t i = 0; i <= len1; ++i) {
+        for (size_t j = 0; j <= len2; ++j) {
+            if (i == 0)
+                dp[i][j] = j;  // If the first string is empty, all characters of second string are added
+            else if (j == 0)
+                dp[i][j] = i;  // If the second string is empty, all characters of first string are deleted
+            else if (str1[i - 1] == str2[j - 1])
+                dp[i][j] = dp[i - 1][j - 1];  // Characters are same, no operation required
+            else
+                dp[i][j] = 1 + (dp[i - 1][j - 1] < dp[i - 1][j] ? (dp[i - 1][j - 1] < dp[i][j - 1] ? dp[i - 1][j - 1] : dp[i][j - 1]) : (dp[i - 1][j] < dp[i][j - 1] ? dp[i - 1][j] : dp[i][j - 1])); // Minimum of replace, delete, and insert operations
+        }
+    }
+
+    // Trace back to find the edits
+    wprintf(L"------------------------------\n");
+    size_t i = 0, j = 0;
+    while (i < len1 || j < len2) {
+        if (i < len1 && j < len2 && str1[i] == str2[j]) 
+        {
+            wprintf(L"%lc", str1[i]);
+            // wprintf(L"Unchanged: %lc\n", str1[i - 1]);
+            i++;
+            j++;
+        } else if (j < len2 && (i == len1 || dp[i][j] == dp[i][j + 1] + 1)) 
+        {
+            wprintf(L"" ANSI_COLOR_GREEN_BG "%lc" ANSI_COLOR_RESET , str2[j]);
+            j++;
+        } else if (i < len1 && (j == len2 || dp[i][j] == dp[i + 1][j] + 1)) 
+        {
+            wprintf(L"" ANSI_COLOR_RED_BG "%lc" ANSI_COLOR_RESET , str1[i]);
+            i++;
+        } else 
+        {
+            wprintf(L"Replaced: " ANSI_COLOR_RED "%lc" ANSI_COLOR_RESET " with " ANSI_COLOR_GREEN "%lc" ANSI_COLOR_RESET "\n", str1[i], str2[j]);
+            i++;
+            j++;
+        }
+    }
+    wprintf(L"\n------------------------------\n\n");
 }
 
 void printDiff(const wchar_t* str1, const wchar_t* str2) {
@@ -178,24 +236,31 @@ void printDiff(const wchar_t* str1, const wchar_t* str2) {
     }
 
     // Trace back to find the edits
+    wprintf(L"\n------------------------------\n");
     size_t i = len1, j = len2;
     while (i > 0 || j > 0) {
-        if (i > 0 && j > 0 && str1[i - 1] == str2[j - 1]) {
-            wprintf(L"Unchanged: %lc\n", str1[i - 1]);
+        if (i > 0 && j > 0 && str1[i - 1] == str2[j - 1]) 
+        {
+            wprintf(L"%lc", str1[i - 1]);
+            // wprintf(L"Unchanged: %lc\n", str1[i - 1]);
             i--;
             j--;
-        } else if (j > 0 && (i == 0 || dp[i][j] == dp[i][j - 1] + 1)) {
-            wprintf(L"Added: %lc\n", str2[j - 1]);
+        } else if (j > 0 && (i == 0 || dp[i][j] == dp[i][j - 1] + 1)) 
+        {
+            wprintf(L"" ANSI_COLOR_GREEN_BG "%lc" ANSI_COLOR_RESET , str2[j - 1]);
             j--;
-        } else if (i > 0 && (j == 0 || dp[i][j] == dp[i - 1][j] + 1)) {
-            wprintf(L"Removed: %lc\n", str1[i - 1]);
+        } else if (i > 0 && (j == 0 || dp[i][j] == dp[i - 1][j] + 1)) 
+        {
+            wprintf(L"" ANSI_COLOR_RED_BG "%lc" ANSI_COLOR_RESET , str1[i - 1]);
             i--;
-        } else {
-            wprintf(L"Replaced: %lc with %lc\n", str1[i - 1], str2[j - 1]);
+        } else 
+        {
+            wprintf(L"Replaced: " ANSI_COLOR_RED "%lc" ANSI_COLOR_RESET " with " ANSI_COLOR_GREEN "%lc" ANSI_COLOR_RESET "\n", str1[i - 1], str2[j - 1]);
             i--;
             j--;
         }
     }
+    wprintf(L"\n------------------------------\n");
 }
 
 // 1, 4, 5, 8
@@ -218,7 +283,7 @@ void remove_space_before_dot(wchar_t* dest)
             i--;
         }
     }
-    wprintf(L"145[%ls]\n", dest);
+    // wprintf(L"145[%ls]\n", dest);
 }
 
 // 7
@@ -226,10 +291,10 @@ void add_space_after_coma_before_alphanum(wchar_t* dest)
 {
 
     size_t length = wcslen(dest);
-    printf("Length before: %zu\n", length);
+    // printf("Length before: %zu\n", length);
 
     // Check if the last character is a wide comma
-    printf("Last character: %lc\n", dest[length - 1]);
+    // printf("Last character: %lc\n", dest[length - 1]);
     if (dest[length - 1] == L',') 
     {
         // printf("Found a wide comma at the end of the sentence.\n");
@@ -242,7 +307,7 @@ void add_space_after_coma_before_alphanum(wchar_t* dest)
             // Add a space after the wide comma
             new_sentence[length] = L' '; // Add the space after the comma
             new_sentence[length + 1] = L'\0'; // Null-terminate the string
-            wprintf(L"New sentence: %ls\n", new_sentence);
+            // wprintf(L"New sentence: %ls\n", new_sentence);
 
             dest = new_sentence;         //deallocation using free has been done assuming that ptr and ptr1 do not point to the same address                     
         }
@@ -254,8 +319,8 @@ void add_space_after_coma_before_alphanum(wchar_t* dest)
             exit(1);
         }
     }
-    printf("Length after: %lu\n", wcslen(dest));
-    wprintf(L"7[%ls]\n", dest);
+    // printf("Length after: %lu\n", wcslen(dest));
+    // wprintf(L"7[%ls]\n", dest);
 }
 
 void count_consecutive_dots(wchar_t* dest) 
@@ -268,7 +333,7 @@ void count_consecutive_dots(wchar_t* dest)
         if (dest[i] == L'.') 
         {
             consecutive_dots++;
-        } 
+        }
         else 
         {
             consecutive_dots = 0;
@@ -288,6 +353,40 @@ void count_consecutive_dots(wchar_t* dest)
         }
     }
 }
+
+void count_two_consecutive_dots(wchar_t* dest) 
+{
+    int consecutive_dots = 0;
+
+    // Iterate through the wide characters of the string
+    for (int i = 0; dest[i] != L'\0'; i++) {
+        // Check if the character is a dot
+        if (dest[i] == L'.') 
+        {
+            consecutive_dots++;
+        } 
+        else 
+        {
+            consecutive_dots = 0;
+        }
+        if (consecutive_dots == 2 && (dest[i+1] != L'.')) 
+        {
+            // wprintf(L"Found more than 3 consecutive dots at index %d.\n", i);
+
+            // Shift characters after the space and dot combination to the left
+            int j;
+            for (j = i; dest[j] != L'\0'; j++) 
+            {
+                dest[j] = dest[j + 1];
+            }
+            // Update the loop control variable to recheck the same position
+            i--;
+        }
+    }
+
+    count_consecutive_dots(dest);
+}
+
 // 9
 void remove_comma_after_starting_word(wchar_t* dest) 
 {
@@ -323,18 +422,17 @@ void remove_comma_after_starting_word(wchar_t* dest)
         // Update the loop control variable to recheck the same position
         max_length--;
     }
-    printf("Max length: %d\n", max_length);
+    // printf("Max length: %d\n", max_length);
 }
 
 // 6
-
 void remove_comma_before_and_after_punct(wchar_t* dest) 
 {
     // Iterate through the wide characters of the sentence
     for (int i = 0; dest[i] != L'\0'; i++) 
     {
         // Check for a comma followed by a dot
-        if (dest[i] == L',' && (is_punct(dest[i + 1]) || iswspace(dest[i + 1]))) 
+        if (dest[i] == L',' && (is_punct(dest[i + 1]) || is_punct(dest[i - 1]))) 
         {
             // wprintf(L"Found a comma followed by a dot at index %d.\n", i);
             // Shift characters after the space and dot combination to the left
@@ -347,6 +445,120 @@ void remove_comma_before_and_after_punct(wchar_t* dest)
             i--;
         }
     }
-    count_consecutive_dots(dest);
-    wprintf(L"[%ls]\n", dest);
+    count_two_consecutive_dots(dest);
+    // wprintf(L"6[%ls]\n", dest);
+}
+
+// 10
+void add_comma_after_starting_word(wchar_t* dest) 
+{
+    int length = 0;
+    int sequence_length = wcslen(dest);
+
+    // Iterate over each word sequence
+    for (int i = 0; i < NDGR2; i++) {
+        const wchar_t* sequence = ndgr2[i];
+
+        // Check if the sequence is present in the sentence
+        const wchar_t* found = wcsstr(dest, sequence);
+        if (found != NULL) {
+            // Calculate the length of the sequence found in the sentence
+            length = wcslen(ndgr2[i]);
+        }
+    }
+    if(dest[length] == L' ')
+    {
+        // printf("Found a wide comma at the end of the sentence.\n");
+        // Allocate memory for the new sentence with an additional space
+        wchar_t* new_sentence = realloc((wchar_t*)dest, (sequence_length + 4) * sizeof(wchar_t));
+
+        if (new_sentence)
+        {
+            size_t array_length = wcslen(new_sentence);
+            printf("Memory reallocated successfully\n");
+            // Shift all characters after the first word to the right
+            for (size_t i = array_length - 1; i > length; i--) 
+            {
+                new_sentence[i] = new_sentence[i - 1];
+            }
+
+            // Add a space after the wide comma
+            new_sentence[length] = L','; // Add the space after the comma
+            // wprintf(L"New sentence: %ls\n", new_sentence);
+
+            dest = new_sentence;
+        }
+        else
+        {
+            free(dest);
+            // Handle the case where realloc fails
+            wprintf(L"Memory reallocation failed\n");
+            exit(1);
+        }
+    }
+}
+
+// 19
+void remove_comma_after_che(wchar_t *dest) {
+    // Find the position of the substring "че"
+    wchar_t *che_pos = wcsstr(dest, L"че");
+
+    if (che_pos != NULL) {
+        // Calculate the index of the comma following the substring "че"
+        size_t comma_index = che_pos - dest + 2;
+
+        // Check if there is a comma following the substring "че"
+        if (dest[comma_index] == L',') {
+            // Shift all characters after the comma to the left
+            for (size_t i = comma_index; dest[i] != L'\0'; i++) {
+                dest[i] = dest[i + 1];
+            }
+        }
+    }
+    // wprintf(L"New sentence: %ls\n", dest);
+}
+
+// 16
+void add_comma_after_za_syjalenie(wchar_t* dest) 
+{
+    int length = 0;
+    int sequence_length = wcslen(dest);
+    wchar_t* sorry = L"за съжаление";
+
+    // Find the position of the substring in the array
+    wchar_t *substr_pos = wcsstr(dest, sorry);
+
+    if (substr_pos != NULL) {
+        // Calculate the index of the character after the substring
+        size_t index = substr_pos - dest + wcslen(sorry);
+
+        wchar_t* new_sentence = (wchar_t *)realloc(dest, (wcslen(dest) + 4) * sizeof(wchar_t));
+        if (new_sentence == NULL) {
+            fprintf(stderr, "Memory reallocation failed\n");
+            exit(1);
+        }
+        // Insert a comma after the substring
+        for (size_t i = wcslen(new_sentence) + 1; i > index; i--) {
+            new_sentence[i] = new_sentence[i - 1];
+        }
+        new_sentence[index] = L',';
+
+        dest = new_sentence;
+    }
+
+    // wprintf(L"16New sentence: %ls\n", dest);
+}
+
+void write_corrected_sentence_to_file(wchar_t* dest)
+{
+    // Open a file for writing in wide character mode
+    FILE *file = fopen("corrected.txt", "a, ccs=UTF-8");
+    if (file == NULL) {
+        wprintf(L"Failed to open file for writing.\n");
+    }
+
+    fwprintf(file, L"%ls\n", dest);
+
+    // Close the file
+    fclose(file);
 }
