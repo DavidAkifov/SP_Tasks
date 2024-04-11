@@ -3,29 +3,31 @@
 #include <ctype.h>
 #include <string.h>
 
+
 enum State {
-    START,
-    POSITIVE_SIGN,
-    NEGATIVE_SIGN,
-    OCTAL,
-    CHECK_OCTAL,
-    HEX,
-    INTEGER,
-    NEGATIVE_INTEGER,
-    NEGATIVE_SUFFIX,
-    SUFFIX_U,
-    SUFFIX_L,
-    CHECK_REAL,
-    REAL_NUMBER_WITHOUT_LEADING,
-    REAL_NUMBERS_WITHOUT_E,
-    REAL_NUMBERS_WITH_E,
-    SUFFIX_REAL_NUMBERS,
-    ACCEPT,
-    REJECT
+    START, // 0
+    POSITIVE_SIGN, // 1
+    NEGATIVE_SIGN, // 2
+    OCTAL,  // 3
+    CHECK_OCTAL, // 4
+    HEX, // 5
+    INTEGER, // 6
+    NEGATIVE_INTEGER, // 7
+     NEGATIVE_SUFFIX_L, // 8
+    SUFFIX_U, // 9
+    SUFFIX_L, // 10
+    CHECK_REAL, // 11
+    REAL_NUMBER_WITHOUT_LEADING, // 12
+    REAL_NUMBERS_WITHOUT_E, // 13
+    REAL_NUMBERS_WITH_E, // 14
+    SUFFIX_REAL_NUMBERS, // 15
+    ACCEPT, // 16
+    REJECT // 17
 };
 
 char previousChar;
 char suffix_checker;
+int state_count[18] = {0};
 
 enum State transition(enum State current, char input) {
     switch(current) {
@@ -74,7 +76,7 @@ enum State transition(enum State current, char input) {
         case NEGATIVE_SIGN:
             if (input == '0') 
             {
-                return CHECK_REAL;
+                return REAL_NUMBERS_WITH_E;
             }
             else if (input == '.')
             {
@@ -103,6 +105,10 @@ enum State transition(enum State current, char input) {
                 {
                     return HEX;
                 }
+                else if (input == '.' )
+                {  
+                    return REAL_NUMBERS_WITHOUT_E;
+                }
                 else
                 {
                     return REJECT;
@@ -118,10 +124,7 @@ enum State transition(enum State current, char input) {
             {
                 return OCTAL;
             }
-            else if (isspace(input) || input == '\0' || input == '/')
-            {
-                return ACCEPT;
-            }
+             
             else if (input == 'u' || input == 'U')
             {
                 return SUFFIX_U;
@@ -138,6 +141,7 @@ enum State transition(enum State current, char input) {
             {
                 return REAL_NUMBERS_WITHOUT_E;
             }
+             
             else
             {
                 return REJECT;
@@ -159,21 +163,16 @@ enum State transition(enum State current, char input) {
             {
                 return REJECT;
             }
-            else if (isspace(input) || input == '\0' || input == '/')
-            {
-                return ACCEPT;
-            }
+             
+             
             else 
             {
                 return REJECT;
             }
             
         case INTEGER:
-            if (isdigit(input)) {
+            if (isdigit(input) || input == '\n') {
                 return INTEGER;
-            } else if (isspace(input) || input == '\0' || input == '/')
-            {
-                return ACCEPT;
             } 
             else if (input == 'u' || input == 'U')
             {
@@ -187,18 +186,15 @@ enum State transition(enum State current, char input) {
             {
                 return REAL_NUMBERS_WITHOUT_E;
             }
+            
             else
             {
                 return REJECT;
             }
         case NEGATIVE_INTEGER:
-            if (isdigit(input)) 
+            if (isdigit(input) || input == '\n') 
             {
                 return NEGATIVE_INTEGER;
-            }
-            else if (isspace(input) || input == '\0' || input == '/') 
-            {
-                return ACCEPT;
             }
             else if (input == 'u' || input == 'U') 
             {
@@ -206,7 +202,7 @@ enum State transition(enum State current, char input) {
             }
             else if (input == 'l' || input == 'L') 
             {
-                return NEGATIVE_SUFFIX;
+                return  NEGATIVE_SUFFIX_L;
             }
             else if (input == '.')
             {
@@ -216,6 +212,7 @@ enum State transition(enum State current, char input) {
             {
                 return REAL_NUMBERS_WITH_E;
             }
+             
             else
             {
                 return REJECT;
@@ -225,18 +222,16 @@ enum State transition(enum State current, char input) {
             {
                 return REJECT;
             } 
-            else if ((input == 'l'  && previousChar == 'l') || (input == 'L'  && previousChar == 'L'))
+            else if ((input == 'l'  && previousChar == 'l') || (input == 'L'  && previousChar == 'L') || input == '\n')
             {
                 return SUFFIX_L; 
             } 
-            else if ((input == 'u' || input == 'U') && (previousChar == 'l' || previousChar == 'L'))
+            else if ((input == 'u' || input == 'U') && (previousChar == 'l' || previousChar == 'L')|| input == '\n')
             {
                 return SUFFIX_L; 
             }
-            else if (isspace(input) || input == '\0' || input == '/')
-            {
-                return ACCEPT;
-            }
+             
+             
             else
             {
                 return REJECT;
@@ -246,47 +241,43 @@ enum State transition(enum State current, char input) {
             {
                 return REJECT;
             } 
-            else if (input == 'l'  && previousChar == 'l')
+            else if (input == 'l'  && previousChar == 'l' || input == '\n')
             {
                 return SUFFIX_U; 
             } 
-            else if (input == 'L'  && previousChar == 'L')
+            else if (input == 'L'  && previousChar == 'L' || input == '\n')
             {
                 return SUFFIX_U; 
             }
-            else if (input == 'l' && (previousChar =='u' || previousChar =='U'))
+            else if (input == 'l' && (previousChar =='u' || previousChar =='U' || input == '\n'))
             {
                 return SUFFIX_U; 
             }
-            else if (input == 'L' && (previousChar =='u' || previousChar =='U'))
+            else if (input == 'L' && (previousChar =='u' || previousChar =='U') || input == '\n')
             {
                 return SUFFIX_U; 
             }
-            else if (isspace(input) || input == '\0' || input == '/')
-            {
-                return ACCEPT;
-            }
+             
+             
             else
             {
                 return REJECT;
             }
-        case NEGATIVE_SUFFIX:
+        case  NEGATIVE_SUFFIX_L:
             if (input == 'u' || input == 'U') 
             {
                 return REJECT;
             } 
-            else if (input == 'l'  && previousChar == 'l')
+            else if (input == 'l'  && previousChar == 'l' || input == '\n')
             {
-                return NEGATIVE_SUFFIX; 
+                return  NEGATIVE_SUFFIX_L; 
             } 
-            else if (input == 'L'  && previousChar == 'L')
+            else if (input == 'L'  && previousChar == 'L' || input == '\n')
             {
-                return NEGATIVE_SUFFIX; 
+                return  NEGATIVE_SUFFIX_L; 
             }
-            else if (isspace(input) || input == '\0' || input == '/')
-            {
-                return ACCEPT;
-            }
+             
+             
             else 
             {
                 return REJECT;
@@ -313,10 +304,7 @@ enum State transition(enum State current, char input) {
             {
                 return REAL_NUMBERS_WITHOUT_E;
             }
-            else if (isspace(input) || input == '\0' || input == '/')
-            {
-                return ACCEPT;
-            }
+             
             else if (input =='e' || input == 'E')
             {
                 return REAL_NUMBERS_WITH_E;
@@ -330,7 +318,7 @@ enum State transition(enum State current, char input) {
                 return REJECT;
             }
         case REAL_NUMBERS_WITH_E:
-            if (isdigit(input))
+            if (isdigit(input) || input == '\n')
             {
                 return REAL_NUMBERS_WITH_E;
             }
@@ -338,15 +326,12 @@ enum State transition(enum State current, char input) {
             {
                 return REAL_NUMBERS_WITH_E;
             }
-            else if ( (previousChar == '.' || previousChar == 'e' || previousChar == 'E' ) && (isspace(input) || input == '\0' || input == '/'))
+            else if ( (previousChar == '.' || previousChar == 'e' || previousChar == 'E' ) && (input == '\0' || input == '/'))
             {
                 return REJECT;
             }
-            else if (isspace(input) || input == '\0' || input == '/')
-            {
-                return ACCEPT;
-            }
-            else if (input == 'f' || input == 'F' || input == 'l' || input == 'L')
+             
+            else if (input == 'f' || input == 'F' || input == 'l' || input == 'L' || input == '\n')
             {
                 return SUFFIX_REAL_NUMBERS;
             }
@@ -355,11 +340,11 @@ enum State transition(enum State current, char input) {
                 return REJECT;
             }
         case REAL_NUMBER_WITHOUT_LEADING:
-            if(isspace(input) || input == '\0' || input == '/')
+            if(input == '\0' || input == '/')
             {
                 return REJECT;
             }
-            else if (input == 'e' || input == 'E')
+            else if (input == 'e' || input == 'E' )
             {
                 return REAL_NUMBERS_WITH_E;
             }
@@ -374,16 +359,13 @@ enum State transition(enum State current, char input) {
         case SUFFIX_REAL_NUMBERS:
             if((previousChar != input) && (input == 'l' || input == 'L'))
             {
-                return ACCEPT;
+                return SUFFIX_REAL_NUMBERS;
             }
             if((previousChar != input) && (input == 'f' || input == 'F'))
             {
-                return ACCEPT;
+                return SUFFIX_REAL_NUMBERS;
             }
-            else if (isspace(input) || input == '\0' || input == '/')
-            {
-                return ACCEPT;
-            }
+             
             else
             {
                 return REJECT;
@@ -396,85 +378,110 @@ enum State transition(enum State current, char input) {
 
 bool validate_integer(const char *input) {
     enum State current = START;
+    
+    if (strlen(input) == 1)
+    {
+        state_count[6]++;
+        return 1;
+    }
 
     for (int i = 0; input[i] != '\0'; i++) {
         char current_char = input[i];
         if (input[i-1])
             previousChar = input[i-1];
         current = transition(current, current_char);
-        if (current == REJECT) {
-            printf("Rejected input '%s': ", input);
-            switch (current) {
-                case POSITIVE_SIGN:
-                    printf("Positive sign '+' at an unexpected position\n");
-                    break;
-                case NEGATIVE_SIGN:
-                    printf("Negative sign '-' at an unexpected position\n");
-                    break;
-                case OCTAL:
-                    printf("Unexpected digit '%c' in octal representation\n", current_char);
-                    break;
-                case HEX:
-                    printf("Invalid hexadecimal digit '%c'\n", current_char);
-                    break;
-                case SUFFIX_L:
-                case SUFFIX_U:
-                    printf("Unexpected suffix '%c'\n", current_char);
-                    break;
-                case REAL_NUMBER_WITHOUT_LEADING:
-                    printf("Decimal point '.' at an unexpected position\n");
-                    break;
-                case REAL_NUMBERS_WITHOUT_E:
-                    printf("Unexpected character '%c' in real number\n", current_char);
-                    break;
-                case REAL_NUMBERS_WITH_E:
-                    printf("Unexpected character '%c' after 'e' in real number\n", current_char);
-                    break;
-                default:
-                    printf("Unexpected character '%c'\n", current_char);
-                    break;
-            }
-            return false;
-        }
+        
+        // if (current == REJECT) {
+        //     printf("Rejected input '%s': ", input);
+        //     switch (current) {
+        //         case POSITIVE_SIGN:
+        //             printf("Positive sign '+' at an unexpected position\n");
+        //             break;
+        //         case NEGATIVE_SIGN:
+        //             printf("Negative sign '-' at an unexpected position\n");
+        //             break;
+        //         case OCTAL:
+        //             printf("Unexpected digit '%c' in octal representation\n", current_char);
+        //             break;
+        //         case HEX:
+        //             printf("Invalid hexadecimal digit '%c'\n", current_char);
+        //             break;
+        //         case SUFFIX_L:
+        //         case SUFFIX_U:
+        //             printf("Unexpected suffix '%c'\n", current_char);
+        //             break;
+        //         case REAL_NUMBER_WITHOUT_LEADING:
+        //             printf("Decimal point '.' at an unexpected position\n");
+        //             break;
+        //         case REAL_NUMBERS_WITHOUT_E:
+        //             printf("Unexpected character '%c' in real number\n", current_char);
+        //             break;
+        //         case REAL_NUMBERS_WITH_E:
+        //             printf("Unexpected character '%c' after 'e' in real number\n", current_char);
+        //             break;
+        //         default:
+        //             printf("Unexpected character '%c'\n", current_char);
+        //             break;
+        //     }
+        //     return false;
+        // }
     }
-
-    return current == ACCEPT;
+    if (current != REJECT)
+    {
+        state_count[current]++;
+        return 1;
+    }
+    return 0;
 }
 
 
 int main() {
-    FILE *file = fopen("tests.txt", "r");
+    FILE *file = fopen("test_FSM.txt", "r");
     if (file == NULL) {
         perror("Error opening file");
         return 1;
     }
 
-    char line[255];
+    char line[255] = "";
     int valid_ints_count = 0;
 
+    // I want to get the first number from the file and validate it
+    
+    
+    
+
     while (fgets(line, sizeof(line), file)) {
-        char *newline_pos = strchr(line, '\n');
-        if (newline_pos != NULL) {
-            *newline_pos = '\0';
-        }
 
-        char *comment_pos = strchr(line, '/');
-        if (comment_pos != NULL) {
-            *comment_pos = '\0';
-        }
 
-        char *number_start = line;
-        while (isspace(*number_start)) {
-            number_start++;
-        }
+    // Tokenize the string by space
+    char* token = strtok(line, " ");
+    
+    // Print each token
+    while (token != NULL) 
+    {
 
-        if (validate_integer(number_start)) {
+        if (validate_integer(token)) {
             valid_ints_count++;
-            printf("Accepted input: %s\n", number_start);
         }
+
+        //printf("token: [%s]\n", token);
+        token = strtok(NULL, " ");
+        
+
     }
+    }
+    printf("POSITIVE_INTEGER: %d\n", state_count[6]);
+    printf("NEGATIVE_INTEGER: %d\n", state_count[7]);
+    printf("OCTAL: %d\n", state_count[3]);
+    printf("HEX: %d\n", state_count[5]);
+    printf("NEGATIVE_SUFFIX_L  %d\n", state_count[8]);
+    printf("SUFFIX_L: %d\n", state_count[10]);
+    printf("SUFFIX_U: %d\n", state_count[9]);
+    printf("REAL_NUMBERS_WITHOUT_E: %d\n", state_count[13]);
+    printf("REAL_NUMBERS_WITH_E: %d\n", state_count[14]);
+    printf("SUFFIX_REAL_NUMBERS: %d\n", state_count[15]);
+
 
     fclose(file);
-    printf("Total valid integers: %d\n", valid_ints_count);
     return 0;
 }
